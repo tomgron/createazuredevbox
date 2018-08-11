@@ -2,7 +2,7 @@
 
 $LocationName = "North Europe"
 $ResourceGroupName = "DevBox-$(get-date -f yyyy-MM-dd)"
-$Random = -join ((97..122) | Get-Random -Count 20 | % {[char]$_})
+$Random = -join ((97..122) | Get-Random -Count 5 | % {[char]$_})
 
 if ((Get-AzureRmContext) -eq $null) { Login-AzureRmAccount }
 
