@@ -84,6 +84,16 @@ catch {
     Write-Host ERROR -BackgroundColor Red -ForegroundColor White
 }
 
+# Download install.cmd from gist
+Write "Download install.cmd"
+#Invoke-WebRequest https://gist.githubusercontent.com/tomgron/5309d64c0cc07eb1cac9f048513d9dc3/raw/0a5aacfda61a647708e09f6736ed5c928a1d41f5/install.cmd -OutFile install.cmd
+
+write "Upload install.cmd to server and start installation - this will take a lot of time..."
+.\UploadScripts.ps1 -ResourceGroupName $ResourceGroupName -VMName $VMName -LocationName $LocationName -ScriptToUpload .\install.cmd -RunFileName "install.cmd" -ScriptExtensionName "installcmd"
+
+#Optional - shut down the VM to save costs
+Stop-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Force
+
 #output necessary info
 Write-Host "IP of server : $addr for RDP connections"
 Write-Host "Username : LocalAdminUser, Password : $VMLocalClearTextPassword"
