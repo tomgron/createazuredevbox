@@ -104,6 +104,7 @@ Copy-Item -Path .\RemoteInstall.ps1 -Destination c:\RemoteInstall.ps1 -ToSession
 Invoke-Command -Session $session { c:\RemoteInstall.ps1 }
 
 #Optional - shut down the VM to save costs
+write "Shutting down VM to cut costs"
 Stop-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Force
 
 #output necessary info
