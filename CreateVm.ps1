@@ -96,7 +96,7 @@ Measure-Command {
 
     # Download RemoteInstall.ps1 from gist
     Write "Download latest RemoteInstall.ps1 from GitHub"
-    #Invoke-WebRequest https://gist.githubusercontent.com/tomgron/5309d64c0cc07eb1cac9f048513d9dc3/raw/0a5aacfda61a647708e09f6736ed5c928a1d41f5/install.cmd -OutFile .\RemoteInstall.ps1
+    Invoke-WebRequest https://gist.githubusercontent.com/tomgron/5309d64c0cc07eb1cac9f048513d9dc3/raw/0a5aacfda61a647708e09f6736ed5c928a1d41f5/install.cmd -OutFile .\RemoteInstall.ps1
 
     write "Upload RemoteInstall.ps1 to server and start installation - this will take a lot of time..."
     Copy-Item -Path .\RemoteInstall.ps1 -Destination c:\RemoteInstall.ps1 -ToSession $session
