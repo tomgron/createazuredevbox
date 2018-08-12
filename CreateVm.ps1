@@ -61,6 +61,11 @@ Measure-Command {
     write "Creating VM"
     New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $LocationName -VM $VirtualMachine -Verbose
 
+    #output necessary info
+    write "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections"
+    write "IP of server : $addr"
+    write "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword"
+    
     # Enable VM to shut down automatically
     write "Enabling autoshutdown"
     .\Set-AzureRmVMAutoShutdown.ps1 -ResourceGroupName $ResourceGroupName -Name $VMName -Enable -Time "19:00:00" -TimeZone "UTC"
@@ -69,7 +74,22 @@ Measure-Command {
     write "Enabling PS remoting"
     .\UploadScripts.ps1 -ResourceGroupName $ResourceGroupName -VMName $VMName -LocationName $LocationName -ScriptToUpload .\EnablePsRemotingOnVM.ps1 -RunFileName "EnablePsRemotingOnVM.ps1" -ScriptExtensionName "EnableRemoting"
 
-    write "Setting Network Connection Profile" -ForegroundColor Yellow
+    # Expand OS disk - first stop VM
+    Write "Stopping VM for disk resize"
+    Stop-AzureRmVm -ResourceGroupName $ResourceGroupName -Name $VMName -Force
+
+    Write "Resizing disk from 127GB top 256GB"
+    $disk = Get-AzureRmDisk -ResourceGroupName $ResourceGroupName -DiskName $VirtualMachine.StorageProfile.OsDisk.Name
+    $disk.DiskSizeGB = 256
+    Update-AzureRmDisk -ResourceGroupName $ResourceGroupName -Disk $disk -DiskName $disk.Name
+    
+    write "Starting Azure VM"
+    Start-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName
+
+    write "Resizing logical volume C:"
+    .\UploadScripts.ps1 -ResourceGroupName $ResourceGroupName -VMName $VMName -ScriptToUpload .\RemoteResizeVolume.ps1 -RunFileName RemoteResizeVolume.ps1 -ScriptExtensionName "ResizeVolume" -LocationName $LocationName
+    
+    write "Setting Local Network Connection Profile to work with remote VMs" -ForegroundColor Yellow
     Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private
 
     write "Enabling PS remoting locally"
@@ -84,32 +104,28 @@ Measure-Command {
 
         $uri = "https://"+$addr+":5986"
 
-        Write-Host "Connecting PSSession to URI $uri"
+        write "Connecting PSSession to URI $uri"
 
         $session = New-PSSession -ConnectionUri $uri -Credential $LocalAdminCred -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck) -Authentication Negotiate
 
-        Write-Host "Connected"
+        write "Connected"
     }
     catch {
-        Write-Host ERROR -BackgroundColor Red -ForegroundColor White
+        write ERROR -BackgroundColor Red -ForegroundColor White
     }
 
     # Download RemoteInstall.ps1 from gist
-    Write "Download latest RemoteInstall.ps1 from GitHub"
-    Invoke-WebRequest https://gist.githubusercontent.com/tomgron/5309d64c0cc07eb1cac9f048513d9dc3/raw/0a5aacfda61a647708e09f6736ed5c928a1d41f5/install.cmd -OutFile .\RemoteInstall.ps1
+    # Write "Download latest RemoteInstall.ps1 from GitHub"
+    # Invoke-WebRequest https://gist.githubusercontent.com/tomgron/5309d64c0cc07eb1cac9f048513d9dc3/raw/0a5aacfda61a647708e09f6736ed5c928a1d41f5/install.cmd -OutFile .\RemoteInstall.ps1
 
-    write "Upload RemoteInstall.ps1 to server and start installation - this will take a lot of time..."
-    Copy-Item -Path .\RemoteInstall.ps1 -Destination c:\RemoteInstall.ps1 -ToSession $session
+    # write "Upload RemoteInstall.ps1 to server and start installation - this will take a lot of time..."
+    # Copy-Item -Path .\RemoteInstall.ps1 -Destination c:\RemoteInstall.ps1 -ToSession $session
 
-    # Run the actual command file
-    Invoke-Command -Session $session { c:\RemoteInstall.ps1 }
+    # # Run the actual command file
+    # Invoke-Command -Session $session { c:\RemoteInstall.ps1 }
 
-    #Optional - shut down the VM to save costs
-    write "Shutting down VM to cut costs"
-    Stop-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Force
+    # #Optional - shut down the VM to save costs
+    # write "Shutting down VM to cut costs"
+    # Stop-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Force
 
-    #output necessary info
-    Write-Host "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections"
-    Write-Host "IP of server : $addr"
-    Write-Host "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword"
 }
