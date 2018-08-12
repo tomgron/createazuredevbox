@@ -61,11 +61,6 @@ Measure-Command {
     write "Creating VM"
     New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $LocationName -VM $VirtualMachine -Verbose
 
-    #output necessary info
-    write "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections"
-    write "IP of server : $addr"
-    write "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword"
-    
     # Enable VM to shut down automatically
     write "Enabling autoshutdown"
     .\Set-AzureRmVMAutoShutdown.ps1 -ResourceGroupName $ResourceGroupName -Name $VMName -Enable -Time "19:00:00" -TimeZone "UTC"
@@ -129,3 +124,9 @@ Measure-Command {
     # Stop-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Force
 
 }
+
+#output necessary info
+write "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections"
+write "IP of server : $addr"
+write "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword"
+
