@@ -9,7 +9,7 @@ Also there could be some kind of options as I personnally work with different te
 
 Preliminary runs take about 16 minutes to create simple VM and install some basic tools like 7zip, Chrome and Firefox. I'll update on this once I get more stuff installed and set up.
 
-## 1.1 update
+## 1.1 update (20.3.2020)
 - Updated to support Az -module
 - Updated to work with Powershell Core
 - Tweaked resource group name and installations (VS2019 instead of VS2017)
