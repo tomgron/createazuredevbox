@@ -12,17 +12,17 @@ param (
 $StorageAccountName = -join ((97..122) | Get-Random -Count 20 | % {[char]$_})
 $ContainerName = "scripts"
 
-New-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Location $LocationName -Name $StorageAccountName -Kind Storage -SkuName Standard_GRS
-$sacc = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName
+New-AzStorageAccount -ResourceGroupName $ResourceGroupName -Location $LocationName -Name $StorageAccountName -Kind Storage -SkuName Standard_GRS
+$sacc = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName
 $url = "https://$StorageAccountName.blob.core.windows.net"
 
-Set-AzureRmCurrentStorageAccount -Name $StorageAccountName -ResourceGroupName $ResourceGroupName
-New-AzureStorageContainer -Name $ContainerName -Permission Blob
+Set-AzCurrentStorageAccount -Name $StorageAccountName -ResourceGroupName $ResourceGroupName
+New-AzStorageContainer -Name $ContainerName -Permission Blob
 
-Set-AzureStorageBlobContent -Container $ContainerName -File $ScriptToUpload
+Set-AzStorageBlobContent -Container $ContainerName -File $ScriptToUpload
 
-Set-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -StorageAccountName $StorageAccountName -ContainerName "scripts" -FileName $RunFileName -Run $RunFileName -Name $ScriptExtensionName -Location $LocationName
+Set-AzVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -StorageAccountName $StorageAccountName -ContainerName "scripts" -FileName $RunFileName -Run $RunFileName -Name $ScriptExtensionName -Location $LocationName
 
 # Clean up
-Remove-AzureRmVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $ScriptExtensionName -Force
-Remove-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName -Force
+Remove-AzVMCustomScriptExtension -ResourceGroupName $ResourceGroupName -VMName $VMName -Name $ScriptExtensionName -Force
+Remove-AzStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName -Force
