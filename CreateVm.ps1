@@ -56,8 +56,8 @@
     write "Creating VM"
     New-AzVM -ResourceGroupName $ResourceGroupName -Location $LocationName -VM $VirtualMachine -Verbose
 
-    write "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections"
-    write "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword"
+    write "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections" >> username.txt
+    write "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword" >> username.txt
 
     # Enable VM to shut down automatically
     write "Enabling autoshutdown"

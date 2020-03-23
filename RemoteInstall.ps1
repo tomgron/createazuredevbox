@@ -22,4 +22,4 @@ choco install office365proplus -y
 choco install jetbrainstoolbox -y
 choco install resharper-ultimate-all -y
 choco install microsoftazurestorageexplorer -y
-choco install choco install visualstudio2019professional --package-parameters "--allWorkloads --includeRecommended --includeOptional --passive --locale en-US" -y
+#choco install choco install visualstudio2019professional --package-parameters "--allWorkloads --includeRecommended --includeOptional --passive --locale en-US" -y
