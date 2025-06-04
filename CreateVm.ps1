@@ -53,39 +53,39 @@
     $VirtualMachine = Set-AzVMSourceImage -VM $VirtualMachine -PublisherName 'MicrosoftWindowsServer' -Offer 'WindowsServer' -Skus '2016-Datacenter-with-Containers' -Version latest
     $VirtualMachine = Set-AzVMBootDiagnostic -VM $VirtualMachine -Disable
 
-    write "Creating VM"
+    Write-Host "Creating VM"
     New-AzVM -ResourceGroupName $ResourceGroupName -Location $LocationName -VM $VirtualMachine -Verbose
 
-    write "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections" >> username.txt
-    write "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword" >> username.txt
+    Write-Host "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections" >> username.txt
+    Write-Host "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword" >> username.txt
 
     # Enable VM to shut down automatically
-    write "Enabling autoshutdown"
+    Write-Host "Enabling autoshutdown"
     .\Set-AzVMAutoShutdown.ps1 -ResourceGroupName $ResourceGroupName -Name $VMName -Enable -Time "19:00:00" -TimeZone "UTC"
 
     # Enable ps remoting
-    write "Enabling PS remoting"
+    Write-Host "Enabling PS remoting"
     .\UploadScripts.ps1 -ResourceGroupName $ResourceGroupName -VMName $VMName -LocationName $LocationName -ScriptToUpload .\EnablePsRemotingOnVM.ps1 -RunFileName "EnablePsRemotingOnVM.ps1" -ScriptExtensionName "EnableRemoting"
 
     # Expand OS disk - first stop VM
-    Write "Stopping VM for disk resize"
+    Write-Host "Stopping VM for disk resize"
     Stop-AzVm -ResourceGroupName $ResourceGroupName -Name $VMName -Force
 
-    Write "Resizing disk from 127GB top 256GB"
+    Write-Host "Resizing disk from 127GB top 256GB"
     $disk = Get-AzDisk -ResourceGroupName $ResourceGroupName -DiskName $VirtualMachine.StorageProfile.OsDisk.Name
     $disk.DiskSizeGB = 256
     Update-AzDisk -ResourceGroupName $ResourceGroupName -Disk $disk -DiskName $disk.Name
     
-    write "Starting Azure VM"
+    Write-Host "Starting Azure VM"
     Start-AzVM -ResourceGroupName $ResourceGroupName -Name $VMName
 
-    write "Resizing logical volume C:"
+    Write-Host "Resizing logical volume C:"
     .\UploadScripts.ps1 -ResourceGroupName $ResourceGroupName -VMName $VMName -ScriptToUpload .\RemoteResizeVolume.ps1 -RunFileName RemoteResizeVolume.ps1 -ScriptExtensionName "ResizeVolume" -LocationName $LocationName
     
-    write "Setting Local Network Connection Profile to work with remote VMs" -ForegroundColor Yellow
+    Write-Host "Setting Local Network Connection Profile to work with remote VMs" -ForegroundColor Yellow
     Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private
 
-    write "Enabling PS remoting locally"
+    Write-Host "Enabling PS remoting locally"
     Enable-PSRemoting -SkipNetworkProfileCheck -Confirm:$false -Force
     Enable-WSManCredSSP -role Client -delegatecomputer "*.northeurope.cloudapp.azure.com" -Force
     $addr = (Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName | select ipaddress).IpAddress.ToString()
@@ -97,14 +97,14 @@
 
         $uri = "https://"+$addr+":5986"
 
-        write "Connecting PSSession to URI $uri"
+        Write-Host "Connecting PSSession to URI $uri"
 
         $session = New-PSSession -ConnectionUri $uri -Credential $LocalAdminCred -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck) -Authentication Negotiate
 
-        write "Connected"
+        Write-Host "Connected"
     }
     catch {
-        write ERROR -BackgroundColor Red -ForegroundColor White
+        Write-Host ERROR -BackgroundColor Red -ForegroundColor White
     }
 
     # write "Upload RemoteInstall.ps1 to server and start installation - this will take a lot of time..."
@@ -114,11 +114,11 @@
     Invoke-Command -Session $session { c:\RemoteInstall.ps1 }
 
     # #Optional - shut down the VM to save costs
-    write "Shutting down VM to cut costs"
+    Write-Host "Shutting down VM to cut costs"
     Stop-AzVM -ResourceGroupName $ResourceGroupName -Name $VMName -Force
 
 #output necessary info
-write "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections"
-write "IP of server : $addr"
-write "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword"
+Write-Host "DNS of server: $DNSNameLabel.northeurope.cloudapp.azure.com for RDP connections"
+Write-Host "IP of server : $addr"
+Write-Host "Username : $addr\LocalAdminUser, Password : $VMLocalClearTextPassword"
 
