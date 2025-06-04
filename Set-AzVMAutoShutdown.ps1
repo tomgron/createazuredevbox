@@ -3,7 +3,7 @@
         Sets the auto-shutdown property for a virtual machine hosted in Microsoft Azure.
 
     .DESCRIPTION
-        The Set-AzureRmVMAutoShutdown script set the auto-shutdown property for a virtual machine.
+        The Set-AzVMAutoShutdown script sets the auto-shutdown property for a virtual machine.
 
     .PARAMETER ResourceGroupName
         Specifies the name of a resource group.
@@ -30,27 +30,27 @@
         The e-mail address to which the notification will be sent.
 
     .EXAMPLE
-        Set-AzureRmVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00
+        Set-AzVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00
 
         Enables auto-shutdown on virtual machine MYVM001 in resource group RG-WE-001 and sets the daily shutdown to take place at 19:00.
 
     .EXAMPLE
-        Set-AzureRmVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00 -TimeZone "W. Europe Standard Time"
+        Set-AzVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00 -TimeZone "W. Europe Standard Time"
 
         Enables auto-shutdown on virtual machine MYVM001 in resource group RG-WE-001 and sets the daily shutdown to take place at 19:00 in "W. Europe Standard Time" time zone.
 
     .EXAMPLE
-        Set-AzureRmVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00 -TimeZone "W. Europe Standard Time" -WebhookURL "https://myapp.azurewebsites.net/webhook"
+        Set-AzVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00 -TimeZone "W. Europe Standard Time" -WebhookURL "https://myapp.azurewebsites.net/webhook"
 
         Enables auto-shutdown on virtual machine MYVM001 in resource group RG-WE-001 and sets the daily shutdown to take place at 19:00 in "W. Europe Standard Time" time zone. Notifications will be enabled and the WebhookURL will be set to "https://myapp.azurewebsites.net/webhook".
 
     .EXAMPLE
-        Set-AzureRmVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00 -TimeZone "W. Europe Standard Time" -Email "alerts@mycompany.com"
+        Set-AzVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Enable -Time 19:00 -TimeZone "W. Europe Standard Time" -Email "alerts@mycompany.com"
 
         Enables auto-shutdown on virtual machine MYVM001 in resource group RG-WE-001 and sets the daily shutdown to take place at 19:00 in "W. Europe Standard Time" time zone. Notifications will be enabled and sent to alerts@mycompany.com
 
     .EXAMPLE
-        Set-AzureRmVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Disable
+        Set-AzVMAutoShutdown -ResourceGroupName RG-WE-001 -Name MYVM001 -Disable
 
         Disables auto-shutdown on virtual machine MYVM001 in resource group RG-WE-001.
 #>
