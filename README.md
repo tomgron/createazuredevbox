@@ -13,3 +13,14 @@ Preliminary runs take about 16 minutes to create simple VM and install some basi
 - Updated to support Az -module
 - Updated to work with Powershell Core
 - Tweaked resource group name and installations (VS2019 instead of VS2017)
+
+## Running tests
+
+Install PowerShell and Pester. Then execute the tests from the repository root:
+
+```powershell
+Import-Module ./Pester-main/Pester.psd1
+Invoke-Pester -Path tests
+```
+
+The tests mock all Az cmdlets and simply assert that `CreateVm.ps1` loads without syntax errors.
